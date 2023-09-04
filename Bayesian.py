@@ -47,7 +47,7 @@ class Belief():
         self.monte_carlo(x, y)
         self.laplace_approx()
 
-def linear(theta, x): # TODO : 여러 개 들어오면 여러개 내 보내줘야함 or r_hat이 list이거나
+def linear(theta, x):
     return sigmoid(theta.T@x)
 
 Belief_test = Belief(linear)
