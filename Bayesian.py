@@ -52,3 +52,4 @@ def linear(theta, x):
 
 Belief_test = Belief(linear)
 Belief_test.update(np.ones(4), 1)
+
