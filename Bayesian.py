@@ -2,54 +2,60 @@ import random
 import numpy as np
 import pandas as pd
 
-import pymc3 as pm
-from scipy import optimize
+from scipy.optimize import minimize
+from sklearn.neighbors import KernelDensity
 
 def normalize(belief):   return belief/sum(belief)
 def sigmoid(x): return 1 / (1 + np.exp(-x))
 
+
 class Belief():
-    def __init__(self, correct, dim=4, num=10000):
-        self.dim, self.correct = dim, correct # set correct rate function
-
-        self.model = pm.Model()
-        self.num, self.samples = num, np.random.multivariate_normal(np.zeros(dim), np.eye(dim), num) # sample by initial Gaussian
-        
-        self.t, self.theta_hat_t, self.Sigma_t = 1, [np.zeros(dim)], [np.eye(dim)] # record Sigma at each step
-
-    def monte_carlo(self, x, y):
-        with self.model:
-            mu = pm.Empirical("mu", self.samples) # 이 부분이 바뀌어야하는데 
-            likelihood = lambda theta : self.correct(theta, x) if y==1 else 1-self.correct(theta, x)
-            obs = pm.Bernoulli('likelihood', p=likelihood, observed=self.samples)
-            self.samples = pm.sample()
-
-    def laplace_approx(self):
-        with self.model:
-            self.theta_hat = pm.find_MAP(method='L-BFGS-B')
-            self.Sigma = pm.find_hessian(self.theta_hat, vars=[mu])
-
-        self.theta_hat_t.append(self.theta_hat)
-        self.Sigma_t.append(self.Sigma)
-        self.t += 1
+    def __init__(self, correct, dim=4, num=10000, verbose=False):
+        self.correct, self.dim, self.num = correct, dim, num # set correct rate function
+        self.verbose = verbose
+        self.initialize()
 
     def initialize(self): # clear history
-        self.belief = normalize( np.ones(self.num) )
-        self.t, self.theta_hat_t, self.Sigma_t = 0, [], []
-        self.laplace_approx()
+        self.samples = np.random.multivariate_normal(np.zeros(self.dim), np.eye(self.dim), self.num) # sample by initial Gaussian
+        self.kde = KernelDensity(kernel='gaussian', bandwidth=0.2).fit(self.samples)
 
-    def imagine_update(self, x, y): # expect next update
-        r_hat = np.array([self.correct(sample, x) for sample in self.samples])
-        return normalize( self.belief * (r_hat if y == True else (1-r_hat)) ) # 이 부분이 Belief로 바뀔듯
+        self.theta_hat, self.hessian_inv = np.zeros(self.dim), np.eye(self.dim)
+        self.t, self.theta_hat_t, self.hessian_inv_t = 1, [np.zeros(self.dim)], [np.eye(self.dim)] # record hessian_inv at each step
 
-    def update(self, x, y): # realization of update
-        self.belief = self.imagine_update(x, y)
-        self.monte_carlo(x, y)
-        self.laplace_approx()
+        self.explain()
+
+    def bayesian_update(self, x, y):
+        # KDE sampling
+        log_likelihood = lambda theta : np.log( self.correct(theta, x) if y==1 else 1-self.correct(theta, x) )
+        neg_log_posterior = lambda theta : -( log_likelihood(theta) + self.kde.score_samples(theta.reshape(1, -1)) )
+        
+        self.samples = self.kde.sample(self.num) # resampling
+        self.kde = KernelDensity(kernel='gaussian', bandwidth=0.2).fit(self.samples)
+
+        # Laplace Approximation
+        opt_result = minimize(neg_log_posterior, self.theta_hat)
+        self.theta_hat = opt_result.x
+        self.hessian_inv = opt_result.hess_inv
+
+        self.theta_hat_t.append(self.theta_hat) # record theta_hat, hessian_inv
+        self.hessian_inv_t.append(self.hessian_inv)
+        self.t += 1
+
+        self.explain()
+
+    def explain(self):
+        if self.verbose:
+            print('---------------------------')
+            print(f'step t : {self.t}')
+            print(f'MAP : \n {self.theta_hat}')
+            print(f'Hessian_inv : \n {self.hessian_inv}')
+            print('---------------------------')
+
+    # TODO : imagine, realization of update
 
 def linear(theta, x):
     return sigmoid(theta.T@x)
 
-Belief_test = Belief(linear)
-Belief_test.update(np.ones(4), 1)
+Belief_test = Belief(linear, verbose=True)
+Belief_test.bayesian_update(np.ones(4), 1)
 
