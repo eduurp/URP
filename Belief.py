@@ -55,5 +55,3 @@ def linear(theta, x):
 
 Belief_test = Belief(linear, verbose=True)
 Belief_test.bayesian_update(np.ones(4)/1000, 0)
-Belief_test.bayesian_update(np.ones(4)/1000, 1)
-Belief_test.bayesian_update(np.ones(4)/1000, 0)
