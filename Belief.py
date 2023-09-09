@@ -49,9 +49,3 @@ class Belief():
             print('---------------------------')
 
     # TODO : imagine, realization of update
-
-def linear(theta, x):
-    return sigmoid(theta.T@x)
-
-Belief_test = Belief(linear, verbose=True)
-Belief_test.bayesian_update(np.ones(4)/1000, 0)
