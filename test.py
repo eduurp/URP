@@ -1,8 +1,11 @@
-import numpy as np
+from utils import *
 
-def sigmoid(x): return 1 / (1 + np.exp(-x))
+def ones_query(Belief):
+    return np.ones(Belief.dim)/4
 
 def linear(theta, x):
     return sigmoid(theta.T@x)
 
-print(linear(np.ones(4), np.ones(4)))
+Test = Query(ones_query, linear, 4, np.ones(4), verbose=1)
+Test.exam()
+Test.save()
