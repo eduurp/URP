@@ -6,6 +6,4 @@ def ones_query(Belief):
 def linear(theta, x):
     return sigmoid(theta.T@x)
 
-Test = Query(ones_query, linear, 4, np.ones(4), verbose=1)
-Test.exam()
-Test.save()
+make_answers(100, 10)

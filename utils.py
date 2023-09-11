@@ -37,7 +37,7 @@ class Belief():
 
         self.theta_hat, self.neg_hessian = self.init_theta_hat, self.init_neg_hessian
         self.t, self.theta_hat_t, self.neg_hessian_t = 1, [self.theta_hat], [self.neg_hessian]
-        self.x_t, self.y_t = [None], [None]
+        self.x_t, self.y_t = [], []
         
         self.log_prior = lambda theta : log_gaussian(theta, mean=self.init_theta_hat, cov_inv=self.init_neg_hessian)
         self.log_likelihood_t = [ self.log_prior ] # record hessian at each step
