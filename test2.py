@@ -5,7 +5,7 @@ num_t = 100
 num_seed = 10
 num1 = 1
 num2 = 3
-about = 'GB'
+about = 'GB2'
 
 file_name = f"exam_{num_t}_{num_seed}_{num1}_{num2}_{about}"
 file_path = os.path.join('.', file_name)
@@ -24,11 +24,14 @@ for file in os.listdir(file_path):
     elif file == 'correct_rate_seed_t.npy':
         correct_rate = np.load(os.path.join(file_path, file))
 
-seed = 0
+seed = 5
 
 for t in range(99):
-    # print(f'{theta_hat[seed][t+1]} : {y[seed][t]} : {correct_rate[seed][t]}')
+    print(f'{theta_hat[seed][t+1]} : {y[seed][t]} : {correct_rate[seed][t]}')
+    # print(f'{x[seed][t]}')
+    '''
     print(f'{neg_hessian[seed][t+1]}')
     print(f'val : {np.linalg.eig(neg_hessian[seed][t+1])[0]}')
     print(f'vec : {np.linalg.eig(neg_hessian[seed][t+1])[1]}')
+    #'''
 print(true_theta)
