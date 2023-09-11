@@ -1,4 +1,5 @@
 from utils import *
+from record import *
 
 def ones_query(Belief):
     return np.ones(Belief.dim)/4
@@ -6,4 +7,6 @@ def ones_query(Belief):
 def linear(theta, x):
     return sigmoid(theta.T@x)
 
-make_answers(100, 10)
+Test = Exam(ones_query, linear, 4, np.ones(4), verbose=1)
+Test.exam()
+Test.save()

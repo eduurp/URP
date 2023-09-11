@@ -59,7 +59,7 @@ class Belief():
         # Laplace Approximation
         opt_result = minimize(func, self.theta_hat, jac=gradient_func, hess=hessian_func, method='trust-ncg')
         self.theta_hat = opt_result.x
-        self.neg_hessian = -hessian_func(self.theta_hat)
+        self.neg_hessian = hessian_func(self.theta_hat)
 
         self.theta_hat_t.append(self.theta_hat) # record theta_hat, hessian
         self.neg_hessian_t.append(self.neg_hessian)
@@ -80,20 +80,18 @@ class Belief():
 
 
 class Query():
-    def __init__(self, query, correct, dim, true_theta, verbose=1, file_num=None):
+    def __init__(self, query, correct, dim, true_theta, answers, verbose=1):
         self.verbose = verbose
-        file_dict = {int(re.search(r"answers_\d+_\d+_(\d+).npy", f).group(1)): f for f in os.listdir('.') if re.match(r"answers_\d+_\d+_(\d+).npy", f)}
-        self.file_num = max(file_dict.keys()) if not file_num else file_num
-        self.answers = np.load(file_dict[self.file_num])
-
-        self.initialize(query, true_theta)
         self.Belief = Belief(correct, dim, verbose)
         
+        self.answers = answers
         self.num_t, self.num_seed = self.answers.shape[1], self.answers.shape[0]
         self.seed, self.theta_hat_seed_t, self.neg_hessian_seed_t = 0, [], []
         self.x_seed_t, self.y_seed_t = [], []
         self.correct_rate_t, self.correct_rate_seed_t = [], []
-        
+
+        self.initialize(query, true_theta)
+    
     def initialize(self, query, true_theta):
         self.query = query
         self.true_theta = true_theta
@@ -128,6 +126,7 @@ class Query():
             self.seed += 1
 
             self.explain()
+            self.save()
 
     def explain(self):
         if self.verbose>0:
@@ -139,26 +138,4 @@ class Query():
             print('------------------------------------------')
 
     def save(self, about='test'):
-        numbers = [int(re.search(rf"exam_{self.num_t}_{self.num_seed}_{self.file_num}_(\d+).npy", f).group(1)) for f in os.listdir('.') if re.search(rf"exam_{self.num_t}_{self.num_seed}_{self.file_num}_(\d+).npy", f)]
-        folder = f"exam_{self.num_t}_{self.num_seed}_{self.file_num}_{max(numbers, default=0) + 1}"
-        os.makedirs(folder, exist_ok=True)
-
-        np.save(os.path.join(folder, "x_seed_t.npy"), self.x_seed_t)
-        np.save(os.path.join(folder, "y_seed_t.npy"), self.y_seed_t)
-        np.save(os.path.join(folder, "correct_rate_seed_t.npy"), self.correct_rate_seed_t)
-        np.save(os.path.join(folder, "theta_hat_seed_t.npy"), self.theta_hat_seed_t)
-        np.save(os.path.join(folder, "neg_hessian_seed_t.npy"), self.neg_hessian_seed_t)
-
-        # plot
-        for seed, neg_hessian_t in enumerate(self.neg_hessian_seed_t):
-            determinants = [1/np.linalg.det(neg_hessian) for neg_hessian in neg_hessian_t]
-
-            plt.plot(range(len(determinants)), determinants)
-            plt.xlabel("step t")
-            plt.ylabel("det of covariance")
-            plt.title(f"Rule : {about}")
-            if self.verbose>1: plt.show()
-            plt.savefig(os.path.join(folder, f"det_by_t_{seed}.png"))
-            plt.close()
-
-        
+        pass
