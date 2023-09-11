@@ -17,7 +17,7 @@ class Exam(Query):
 
         np.save(os.path.join(self.folder, "true_theta.npy"), self.true_theta)
 
-    def save(self, about='test'):
+    def save(self):
         np.save(os.path.join(self.folder, "x_seed_t.npy"), self.x_seed_t)
         np.save(os.path.join(self.folder, "y_seed_t.npy"), self.y_seed_t)
         np.save(os.path.join(self.folder, "correct_rate_seed_t.npy"), self.correct_rate_seed_t)
