@@ -17,12 +17,6 @@ def gradient_based(Belief):
 def linear_intercept(theta, x):
     return sigmoid(theta.T@x[:-1] + x[-1])
 
-'''
 Test = Exam(gradient_based, linear_intercept, 4, np.ones(4), verbose=1)
 Test.exam()
 Test.save()
-#'''
-
-import numpy as np
-
-np.load()

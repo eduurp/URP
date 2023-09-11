@@ -92,7 +92,7 @@ class Query():
         self.correct_rate_t.append(correct_rate)
         if self.verbose>1:
             print(f'rate : {correct_rate}')
-        return 0 if self.answers[seed][t] < correct_rate else 1
+        return 1 if self.answers[seed][t] < correct_rate else 0
     
     def exam(self):
         if self.verbose>0:
