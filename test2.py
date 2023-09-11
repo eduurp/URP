@@ -5,9 +5,9 @@ num_t = 100
 num_seed = 10
 num1 = 1
 num2 = 1
-name = []
+about = 'GB'
 
-file_name = f"exam_{num_t}_{num_seed}_{num1}_{num2}"
+file_name = f"exam_{num_t}_{num_seed}_{num1}_{num2}_{about}"
 file_path = os.path.join('.', file_name)
 
 for file in os.listdir(file_path):

@@ -81,9 +81,6 @@ class Query():
         self.x_seed_t, self.y_seed_t = [], []
         self.correct_rate_t, self.correct_rate_seed_t = [], []
 
-        self.initialize(query, true_theta)
-    
-    def initialize(self, query, true_theta):
         self.query = query
         self.true_theta = true_theta
 
