@@ -1,5 +1,12 @@
 from utils import *
 
+def make_answers(num_t, num_seed, seed=0):
+    np.random.seed(seed)
+    answers = np.random.random((num_seed, num_t))
+
+    numbers = [int(re.search(r"answers_\d+_\d+_(\d+).npy", f).group(1)) for f in os.listdir('.') if re.search(r"answers_\d+_\d+_(\d+).npy", f)]
+    np.save(f"answers_{num_t}_{num_seed}_{max(numbers, default=0) + 1}.npy", answers)
+
 class Exam(Query):
     def __init__(self, query, correct, dim, true_theta, verbose=1, file_num=None):
         file_dict = {int(re.search(r"answers_\d+_\d+_(\d+).npy", f).group(1)): f for f in os.listdir('.') if re.match(r"answers_\d+_\d+_(\d+).npy", f)}

@@ -17,15 +17,6 @@ def sigmoid(x): return 1 / (1 + np.exp(-x))
 def log_gaussian(x, mean, cov_inv):
     return -(1/2) * (x - mean).T @ (cov_inv) @ (x - mean)
 
-
-def make_answers(num_t, num_seed, seed=0):
-    np.random.seed(seed)
-    answers = np.random.random((num_seed, num_t))
-
-    numbers = [int(re.search(r"answers_\d+_\d+_(\d+).npy", f).group(1)) for f in os.listdir('.') if re.search(r"answers_\d+_\d+_(\d+).npy", f)]
-    np.save(f"answers_{num_t}_{num_seed}_{max(numbers, default=0) + 1}.npy", answers)
-
-
 class Belief():
     def __init__(self, correct, dim, verbose=0):
         self.verbose = verbose
@@ -137,5 +128,5 @@ class Query():
                 print(f't, det : {t}, {cov_det}')
             print('------------------------------------------')
 
-    def save(self, about='test'):
+    def save(self):
         pass
