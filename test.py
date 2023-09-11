@@ -1,16 +1,24 @@
 from utils import *
 from record import *
 
-def ones_query(Belief):
+bound = 1/2 # ???
+
+def fixed_query(Belief):
     return np.ones(Belief.dim)/4
 
 def linear(theta, x):
     return sigmoid(theta.T@x)
 
-def 
-    val,vec = np.linalg.eig(Belief_test.neg_hessian)
-    query = np.insert(query_bound_norm * vec[-1], len(vec[-1]),-query_bound_norm * vec[-1].T@Belief_test.theta_hat)
+def gradient_based(Belief):
+    global bound
+    val, vec = np.linalg.eig(Belief.neg_hessian)
+    return np.append(bound * vec[-1], -bound * vec[-1].T@Belief.theta_hat)
 
-Test = Exam(ones_query, linear, 4, np.ones(4), verbose=1)
+def linear_intercept(theta, x):
+    return sigmoid(theta.T@x[:-1] + x[-1])
+
+Test = Exam(fixed_query, linear, 4, np.ones(4), verbose=1)
 Test.exam()
 Test.save()
+
+
