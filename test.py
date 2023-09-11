@@ -19,4 +19,3 @@ def linear_intercept(theta, x):
 
 Test = Exam(gradient_based, linear_intercept, 4, np.ones(4), 'GB', verbose=1)
 Test.exam()
-Test.save()

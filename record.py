@@ -16,6 +16,8 @@ class Exam(Query):
         self.file_num = max(file_dict.keys()) if not file_num else file_num
         self.about = about
 
+        super().__init__(query, correct, dim, true_theta, np.load(file_dict[self.file_num]), verbose)
+
         numbers = [int(re.search(rf"exam_{self.num_t}_{self.num_seed}_{self.file_num}_(\d+)_.*", f).group(1)) for f in os.listdir('.') if re.search(rf"exam_{self.num_t}_{self.num_seed}_{self.file_num}_(\d+)_.*", f)]
         self.folder = f"exam_{self.num_t}_{self.num_seed}_{self.file_num}_{max(numbers, default=0) + 1}_{self.about}"
         os.makedirs(self.folder, exist_ok=True)
@@ -26,8 +28,6 @@ class Exam(Query):
             f.write(f"start : {self.current_time}\n")
 
         np.save(os.path.join(self.folder, "true_theta.npy"), self.true_theta)
-
-        super().__init__(query, correct, dim, true_theta, np.load(file_dict[self.file_num]), verbose)
 
     def save(self): 
         np.save(os.path.join(self.folder, "x_seed_t.npy"), self.x_seed_t)
