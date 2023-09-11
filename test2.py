@@ -4,8 +4,8 @@ import numpy as np
 num_t = 100
 num_seed = 10
 num1 = 1
-num2 = 3
-about = 'GB2'
+num2 = 2
+about = 'FIX'
 
 file_name = f"exam_{num_t}_{num_seed}_{num1}_{num2}_{about}"
 file_path = os.path.join('.', file_name)
@@ -26,12 +26,16 @@ for file in os.listdir(file_path):
 
 seed = 5
 
+for det in [1/np.linalg.det(nh) for nh in neg_hessian[seed]]:
+    print(det)
+
 for t in range(99):
-    print(f'{theta_hat[seed][t+1]} : {y[seed][t]} : {correct_rate[seed][t]}')
+    pass
+    # print(f'{theta_hat[seed][t+1]} : {y[seed][t]} : {correct_rate[seed][t]}')
     # print(f'{x[seed][t]}')
     '''
     print(f'{neg_hessian[seed][t+1]}')
     print(f'val : {np.linalg.eig(neg_hessian[seed][t+1])[0]}')
     print(f'vec : {np.linalg.eig(neg_hessian[seed][t+1])[1]}')
     #'''
-print(true_theta)
+# print(true_theta)
