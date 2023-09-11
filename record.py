@@ -23,13 +23,3 @@ class Exam(Query):
         np.save(os.path.join(self.folder, "correct_rate_seed_t.npy"), self.correct_rate_seed_t)
         np.save(os.path.join(self.folder, "theta_hat_seed_t.npy"), self.theta_hat_seed_t)
         np.save(os.path.join(self.folder, "neg_hessian_seed_t.npy"), self.neg_hessian_seed_t)
-
-        # plot
-        determinants = [1/np.linalg.det(neg_hessian) for neg_hessian in self.neg_hessian_seed_t[self.seed-1]]
-        plt.plot(range(len(determinants)), determinants)
-        plt.xlabel("step t")
-        plt.ylabel("det of covariance")
-        plt.title(f"Rule : {about}, seed : {self.seed}")
-        if self.verbose>1: plt.show()
-        plt.savefig(os.path.join(self.folder, f"det_by_t_{self.seed}.png"))
-        plt.close()

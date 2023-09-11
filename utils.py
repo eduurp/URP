@@ -53,8 +53,8 @@ class Belief():
         self.y_t.append(y)
 
         func = self.neg_log_posterior
-        gradient_func = nd.Gradient(func)
-        hessian_func = nd.Hessian(func)
+        gradient_func = nd.Gradient(func) # 
+        hessian_func = nd.Hessian(func) #
 
         # Laplace Approximation
         opt_result = minimize(func, self.theta_hat, jac=gradient_func, hess=hessian_func, method='trust-ncg')
