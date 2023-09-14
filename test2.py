@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import matplotlib.pyplot as plt
 
 num_t = 100
 num_seed = 10
@@ -24,18 +25,30 @@ for file in os.listdir(file_path):
     elif file == 'correct_rate_seed_t.npy':
         correct_rate = np.load(os.path.join(file_path, file))
 
-seed = 5
+#'''
+cov_determinant = []
+for neg_hess in neg_hessian:
+    cov_det = []
+    for neg_h in neg_hess:
+        cov_det.append(1/np.linalg.det(neg_h))
+    cov_determinant.append(cov_det)
 
-for det in [1/np.linalg.det(nh) for nh in neg_hessian[seed]]:
-    print(det)
+avg_cov_determinant = np.mean(cov_determinant, axis=0)
+for seed in range(10):  plt.plot(cov_determinant[seed])
+#'''
 
-for t in range(99):
-    pass
-    # print(f'{theta_hat[seed][t+1]} : {y[seed][t]} : {correct_rate[seed][t]}')
-    # print(f'{x[seed][t]}')
-    '''
-    print(f'{neg_hessian[seed][t+1]}')
-    print(f'val : {np.linalg.eig(neg_hessian[seed][t+1])[0]}')
-    print(f'vec : {np.linalg.eig(neg_hessian[seed][t+1])[1]}')
-    #'''
-# print(true_theta)
+'''
+print(np.linalg.norm([0.25, 0.25, 0.25, 0.25]))
+print(x[:,:,:])
+'''
+print(true_theta)
+
+bound = 1/2
+dim = 4
+bound_cov_determinant = np.array([1/(((bound**2/(4*dim))*t + 1)**dim) for t in range(100)])
+
+plt.plot(bound_cov_determinant, label='bound')
+plt.legend()
+plt.show()
+
+# TODO : theta_map 대신 theta_true를 써서 실험 해보자
