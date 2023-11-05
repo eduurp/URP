@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 num_t = 100
 num_seed = 10
