@@ -11,12 +11,12 @@ def make_answers(num_t, num_seed, seed=0):
     np.save(f"answers_{num_t}_{num_seed}_{max(numbers, default=0) + 1}.npy", answers)
 
 class Exam(Query):
-    def __init__(self, query, correct, dim, true_theta, about, verbose=1, file_num=None):
+    def __init__(self, query, correct, dim, true_theta, about, verbose=1, init_theta_hat=None, init_neg_hessian=None, file_num=None):
         file_dict = {int(re.search(r"answers_\d+_\d+_(\d+).npy", f).group(1)): f for f in os.listdir('.') if re.match(r"answers_\d+_\d+_(\d+).npy", f)}
         self.file_num = max(file_dict.keys()) if not file_num else file_num
         self.about = about
 
-        super().__init__(query, correct, dim, true_theta, np.load(file_dict[self.file_num]), verbose)
+        super().__init__(query, correct, dim, true_theta, np.load(file_dict[self.file_num]), verbose, init_theta_hat, init_neg_hessian)
 
         numbers = [int(re.search(rf"exam_{self.num_t}_{self.num_seed}_{self.file_num}_(\d+)_.*", f).group(1)) for f in os.listdir('.') if re.search(rf"exam_{self.num_t}_{self.num_seed}_{self.file_num}_(\d+)_.*", f)]
         self.folder = f"exam_{self.num_t}_{self.num_seed}_{self.file_num}_{max(numbers, default=0) + 1}_{self.about}"

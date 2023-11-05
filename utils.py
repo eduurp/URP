@@ -18,14 +18,15 @@ def log_gaussian(x, mean, cov_inv):
     return -(1/2) * (x - mean).T @ (cov_inv) @ (x - mean)
 
 class Belief():
-    def __init__(self, correct, dim, verbose=0):
+    def __init__(self, correct, dim, verbose=0, init_theta_hat=None, init_neg_hessian=None):
         self.verbose = verbose
         self.correct, self.dim = correct, dim # set correct rate function
+
+        self.init_theta_hat = np.zeros(self.dim) if init_theta_hat is None else init_theta_hat
+        self.init_neg_hessian = np.eye(self.dim) if init_neg_hessian is None else init_neg_hessian
         self.initialize()
 
     def initialize(self): # clear history
-        self.init_theta_hat, self.init_neg_hessian = np.zeros(self.dim), np.eye(self.dim)
-
         self.theta_hat, self.neg_hessian = self.init_theta_hat, self.init_neg_hessian
         self.t, self.theta_hat_t, self.neg_hessian_t = 1, [self.theta_hat], [self.neg_hessian]
         self.x_t, self.y_t = [], []
@@ -62,18 +63,19 @@ class Belief():
         if self.verbose>1:
             print('------------------------------------------')
             print(f'[ t : {self.t} ]')
-            print(f'y : {self.y_t[-1]}')
+            if self.t>1: print(f'y : {self.y_t[-1]}')
             print(f'MAP : \n {self.theta_hat}')
-            print(f'-Hessian : \n {self.neg_hessian}')
+            print(f'Determinant : \n {np.linalg.det(self.neg_hessian)}')
+            print(f'Eigenvalues : \n {np.linalg.eig(self.neg_hessian)[0]}')
             print('------------------------------------------')
 
     # TODO : imagine, realization of update
 
 
 class Query():
-    def __init__(self, query, correct, dim, true_theta, answers, verbose=1):
+    def __init__(self, query, correct, dim, true_theta, answers, verbose=1, init_theta_hat=None, init_neg_hessian=None):
         self.verbose = verbose
-        self.Belief = Belief(correct, dim, verbose)
+        self.Belief = Belief(correct, dim, verbose, init_theta_hat, init_neg_hessian)
         
         self.answers = answers
         self.num_t, self.num_seed = self.answers.shape[1], self.answers.shape[0]
