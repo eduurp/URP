@@ -20,10 +20,6 @@ def log_gaussian(x, mean, cov_inv):
 class Belief():
     def __init__(self, correct, dim, verbose=0, init_theta_hat=None, init_neg_hessian=None):
         self.verbose = verbose
-        self.correct, self.dim = correct, dim # set correct rate function
-
-        self.init_theta_hat = np.zeros(self.dim) if init_theta_hat is None else init_theta_hat
-        self.init_neg_hessian = np.eye(self.dim) if init_neg_hessian is None else init_neg_hessian
         self.initialize()
 
     def initialize(self): # clear history
