@@ -1,21 +1,14 @@
-from utils import *
-from record import *
+from utils.model import *
+from utils.base import *
 
-bound = 1/2 # ???
+import numpy as np
+import os
 
-def fixed_query(Belief):
-    return np.ones(Belief.dim)/4
+# A = np.random.rand(4, 4)
 
-def linear(theta, x):
-    return sigmoid(theta.T@x)
+base = "[231118 05-15-00] MIRT 4 100 10 10 PCM_MIRT"
 
-def gradient_based(Belief):
-    global bound
-    val, vec = np.linalg.eig(Belief.neg_hessian)
-    return np.append(bound * vec[:, np.argmin(val)], -bound * vec[:, np.argmin(val)].T@Belief.theta_hat)
+MyAlgo = PCM_LN(1/2)
+Test = Experiment(MyAlgo, LN, 4, nHess_0=np.load(os.path.join(base, "nHess_0.npy")))
 
-def linear_intercept(theta, x):
-    return sigmoid(theta.T@x[:-1] + x[-1])
-
-Test = Exam(gradient_based, linear_intercept, 4, np.ones(4), 'GB2', verbose=1)
-Test.exam()
+Test.make()
