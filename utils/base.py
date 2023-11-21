@@ -75,20 +75,30 @@ class Belief():
 
 class Algo():
     def __init_subclass__(cls):
-        if not hasattr(cls, 'query') or not callable(getattr(cls, 'query')):
-            raise NotImplementedError(f"{cls.__name__} must implement the 'query' method")
+        check, problem = False, []
+
+        for func_name in ['query', 'f']:
+            not_exist = not hasattr(cls, func_name) or not callable(getattr(cls, func_name))
+            if not_exist: 
+                check = True
+                problem.append(f"{cls.__name__} must implement the {func_name} method")
+                                           
+        if check:
+            raise NotImplementedError('\n'.join(problem))
 
 
 class Experiment():
-    def __init__(self, Algo, f, dim, MAP_0=None, nHess_0=None):
-        self.Belief = Belief(f, dim, MAP_0, nHess_0)
+    def __init__(self, Algo, dim):
         self.Algo = Algo
+        self.dim = dim
 
-        self.true_theta_seed = np.load(TRUE_THETA)
         self.answers_page = np.load(ANSWER_SHEET)
-        self.num_t, self.num_page, self.num_seed = self.answers_page.shape[1], self.answers_page.shape[0], self.true_theta_seed.shape[0]
+        self.true_theta_seed = np.load(TRUE_THETA)
+        self.init_nhess_sbj = np.load(INIT_NHESS)
 
-        self.seed, self.page = 0, 0
+        self.num_t, self.num_page, self.num_seed, self.num_sbj = self.answers_page.shape[1], self.answers_page.shape[0], self.true_theta_seed.shape[0], self.init_nhess_sbj.shape[0]
+
+        self.page, self.seed, self.sbj = 0, 0, 0
     
     def iter_t(self):
         while self.Belief.t < self.num_t:
@@ -135,13 +145,26 @@ class Experiment():
             end_time = time.time()
             if VERBOSE>0: print(f'seed = {self.seed} : {end_time-start_time:2f}')
         return Record_seed
+    
+    def iter_sbj(self):
+        Record_sbj = Record()
+        while self.sbj < self.num_sbj:
+            start_time = time.time()
+
+            self.Belief = Belief(self.Algo.f, self.dim, MAP_0=None, nHess_0=self.init_nhess_sbj[self.sbj])
+            self.seed = 0
+            Record_sbj.merge(self.iter_seed())
+            self.sbj += 1
+            
+            end_time = time.time()
+            if VERBOSE>0: print(f'sbj = {self.sbj} : {end_time-start_time:2f}')
+        return Record_sbj
 
     @save
     def make(self):
-        info = {'f' : self.Belief.f.__name__, 'dim' : self.Belief.dim, 'num_t':self.num_t, 'num_page':self.num_page, 'num_seed':self.num_seed, 'Algo' : self.Algo.__class__.__name__}
+        info = {'Algo' : self.Algo.__class__.__name__, 'f' : self.Algo.f.__name__, 'dim' : self.dim, 'num_t':self.num_t, 'num_page':self.num_page, 'num_seed':self.num_seed, 'num_sbj':self.num_sbj}
         hyp = self.Algo.__dict__
         print(info, hyp)
-
-        result = self.iter_seed().data
-        for k, v in self.Belief.par_0.items(): result[k] = v
+        
+        result = self.iter_sbj().data
         return info, hyp, result
