@@ -115,7 +115,7 @@ class Experiment():
 
             end_time = time.time()
             self.Belief.Record.data['time'].append(end_time-start_time)
-            if VERBOSE>2: print(f't = {self.Belief.t} : {end_time-start_time:2f}')
+            if VERBOSE>3: print(f't = {self.Belief.t} : {end_time-start_time:2f}')
         return self.Belief.Record
 
     def iter_page(self):
@@ -129,7 +129,7 @@ class Experiment():
 
             Record_page.merge(self.iter_t())
             end_time = time.time()
-            if VERBOSE>1: print(f'page = {self.page} : {end_time-start_time:2f}')
+            if VERBOSE>2: print(f'page = {self.page} : {end_time-start_time:2f}')
         return Record_page
 
     def iter_seed(self):
@@ -143,7 +143,7 @@ class Experiment():
             self.seed += 1
             
             end_time = time.time()
-            if VERBOSE>0: print(f'seed = {self.seed} : {end_time-start_time:2f}')
+            if VERBOSE>1: print(f'seed = {self.seed} : {end_time-start_time:2f}')
         return Record_seed
     
     def iter_sbj(self):

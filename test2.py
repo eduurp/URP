@@ -16,13 +16,12 @@ def logdet(A): return np.log(np.linalg.det(A))
 base_MIRT = "[231118 05-15-00] MIRT 4 100 10 10 PCM_MIRT"
 nHess_MIRT = np.load(os.path.join(base_MIRT, "nHess.npy"))
 
+nHess_0_MIRT = np.load(os.path.join(base_MIRT, "nHess_0.npy"))
+
 base_LN = "[231119 15-34-39] LN 4 100 10 10 PCM_LN alpha_0.5"
 nHess_LN = np.load(os.path.join(base_LN, "nHess.npy"))
 
-A = np.load(os.path.join(base_MIRT, "nHess.npy"))
-B = np.load(os.path.join(base_LN, "nHess.npy"))
-print(np.linalg.det(A[0][0][0]))
-print(np.linalg.det(B[0][0][0]))
+nHess_0_LN = np.load(os.path.join(base_MIRT, "nHess_0.npy"))
 
 Hess_nlogdet_MIRT = -logdet(nHess_MIRT)
 plt.plot(Hess_nlogdet_MIRT, label='MIRT')

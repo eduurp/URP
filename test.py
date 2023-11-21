@@ -4,8 +4,10 @@ from utils.base import *
 import numpy as np
 import os
 
+with open('vrf_MIRT.txt', 'w') as file: pass
+
 MyAlgo = PCM_MIRT_EXP()
-Test = Experiment(MyAlgo, 4,)
+Test = Experiment(MyAlgo, 4)
 Test.make()
 
 '''
