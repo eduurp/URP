@@ -6,7 +6,7 @@ import os
 
 with open('vrf_MIRT.txt', 'w') as file: pass
 
-MyAlgo = PCM_MIRT_EXP()
+MyAlgo = PCM_MIRT()
 Test = Experiment(MyAlgo, 4)
 Test.make()
 

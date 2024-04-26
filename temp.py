@@ -1,18 +1,23 @@
-import matplotlib.pyplot as plt
+from scipy.stats import ortho_group
+import numpy as np
 
-opt = []
-vec = []
+t = 10
+d = 3
 
-with open('vrf_MIRT.txt', 'r') as file:
-    for line in file:
-        words = line.strip().split(':')
-        opt = int(words[0].strip())
-        vec = words[1].strip().strip('[]').split(' ')
-        
-        v = []
-        for v_i in vec:
-            if v_i: v.append(float(v_i.strip()))
+X = ortho_group.rvs(dim=t)
+a = np.random.random(t)
+A = np.diag(a)
+B = X@A@X.T
+B_1 = B[:d,:d]
+B_2 = X[:d]@A@X[:d].T
+Y = np.random.random((d, t))
 
-        plt.scatter(v[0], v[1], color = 'red' if opt==1 else 'blue')
+print(np.max(np.linalg.eig(B_1)[0]))
+print(np.max(np.linalg.eig(B)[0]))
 
-plt.show()
+'''
+print(np.linalg.det(B_1))
+print(np.linalg.det(B_2))
+print(np.linalg.det(B))
+print(np.linalg.det(A))
+'''

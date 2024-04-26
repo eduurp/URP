@@ -29,11 +29,11 @@ class PCM_MIRT(Algo):
 
     def query(self, Belief):
         val, vec = np.linalg.eig(Belief.nHess)
-        vec_max = vec[:, np.argmax(val)]
+        vec_max = vec[:, np.argmin(val)]
 
         if np.min(vec_max)*np.max(vec_max) < 0:
-            x1, obj1 = self.sub_query(Belief, vec_max)
-            x2, obj2 = self.sub_query(Belief, -vec_max)
+            x1, obj1 = self.sub_query(Belief, np.array([ v if v>0 else 0 for v in vec_max ]))
+            x2, obj2 = self.sub_query(Belief, np.array([ -v if v<0 else 0 for v in vec_max ]))
             return x1 if obj1>obj2 else x2
         else:
             x, obj = self.sub_query(Belief, np.sign(np.max(vec_max))*vec_max)
