@@ -1,3 +1,10 @@
+import numpy as np
+
+A = np.load("answers.npy")
+
+print(A.shape)
+
+'''
 from scipy.stats import ortho_group
 import numpy as np
 
@@ -14,10 +21,4 @@ Y = np.random.random((d, t))
 
 print(np.max(np.linalg.eig(B_1)[0]))
 print(np.max(np.linalg.eig(B)[0]))
-
-'''
-print(np.linalg.det(B_1))
-print(np.linalg.det(B_2))
-print(np.linalg.det(B))
-print(np.linalg.det(A))
 '''
