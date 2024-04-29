@@ -30,7 +30,7 @@ Predefined functions
 '''
 class Record():
     def __init__(self):
-        self.typs = ['x', 'f', 'true_f', 'MAP', 'nHess', 'time']
+        self.typs = ['x', 'y', 'f', 'true_f', 'MAP', 'nHess', 'time']
         self.data = { typ:[] for typ in self.typs }
 
     def merge(self, subRecord):
@@ -54,18 +54,28 @@ class Belief():
         if nHess_0 is not None: self.nHess_0 = nHess_0
         self.par_0 = {'MAP_0' : self.MAP_0, 'nHess_0' : self.nHess_0}
 
-        self.NLL = lambda theta : - log_gaussian(theta, mean=self.MAP_0, cov_inv=self.nHess_0)
+        NLPrior = lambda theta :  - log_gaussian(theta, mean=self.MAP_0, cov_inv=self.nHess_0)
+        self.NLL = NLPrior
+        self.NLP_t = [NLPrior]
         self.t, self.MAP, self.nHess = 0, self.MAP_0, self.nHess_0
-              
+
         self.Record = Record()
         self.Record.data['MAP'].append(self.MAP)
         self.Record.data['nHess'].append(self.nHess)
 
-    def bayesian_update(self, x, y):
-        NLL_next = lambda theta : self.NLL(theta) - np.log( self.f(theta, x) if y==1 else 1-self.f(theta, x) ) # Log Likelihood
-        self.NLL_next = NLL_next
+    # NLP is depreciated. Use NLL method
+    def NLP(self, theta):
+        return sum(NLP(theta) for NLP in self.NLP_t)
 
-        func = self.NLL
+    def bayesian_update(self, x, y):
+        NLLikelihood = lambda theta : - np.log(self.f(theta, x) if y == 1 else 1 - self.f(theta, x))
+        self.NLP_t.append( NLLikelihood )
+
+        current_NLL = self.NLL
+        def NLL_next(theta):    return current_NLL(theta) + NLLikelihood(theta)
+        self.NLL = NLL_next
+
+        func = self.NLP # or self.NLL
         gradient = nd.Gradient(func)
         hessian = nd.Hessian(func)
 
@@ -125,10 +135,12 @@ class Experiment():
             x = self.Algo.query(self.Belief)
             self.Belief.Record.data['true_f'].append(true_f := self.Belief.f(self.true_theta, x))
             self.Belief.Record.data['f'].append(self.Belief.f(self.Belief.MAP, x))
+            self.Belief.Record.data['x'].append(x)
 
             # Belief by Bayesian update
             y = 1 if self.answers[self.Belief.t] < true_f else 0
             self.Belief.bayesian_update(x, y)
+            self.Belief.Record.data['y'].append(y)
 
             end_time = time.time()
             self.Belief.Record.data['time'].append(end_time-start_time)
