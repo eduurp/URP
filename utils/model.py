@@ -67,6 +67,8 @@ class PCM_MIRT(Algo):
         return x, obj
 
 
+# PCM_MIRT_EXP is Depreciated. Use PCM_MIRT
+"""
 class PCM_MIRT_EXP(PCM_MIRT):
     def sub_query(self, Belief, vec_max):
         sorted_i = np.argsort(vec_max)[::-1]
@@ -111,3 +113,5 @@ class PCM_MIRT_EXP(PCM_MIRT):
         obj = np.array(jcb(Belief.MAP)).T@vec_max
 
         return x, obj
+
+"""
