@@ -54,21 +54,3 @@ class Experiment_Synthetic():
             end_time = time.time()
             self.Belief.Record.data['time'].append(end_time-start_time)
         return self.Belief.Record
-    
-
-def Run_Synthetic(model_name, dim, alpha, true_theta, num_t, MAP_0, nHess_0, iterations) :
-    if model_name == 'MIRT' :
-        f = MIRT
-        Algo = DURM_MIRT(alpha)
-    else :
-        f = LN
-        Algo = DURM_LN(alpha)
-
-    Data = []
-    exp = Experiment_Synthetic(Algo, dim, f, num_t, true_theta, MAP_0, nHess_0)
-    for iter in tqdm(range(iterations)) :
-        data = exp.iter_t()
-        Data.append(data)
-        print(iter)
-    Data = np.array(Data)
-    np.save("Synthetic_" + model_name + "_" + str(dim) + ".npy",Data)
