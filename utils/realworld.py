@@ -3,12 +3,14 @@ import itertools
 
 
 # Sampling Importance Sampling
-def SIR(Belief, iterations) :
+def SIR(Belief) :
     true_pdf = lambda theta: np.exp(np.sum([Belief.LL_t[L_idx](theta) for L_idx in range(len(Belief.LL_t))], axis=0))
     proposal_pdf = lambda theta: ((2*np.pi) ** (-Belief.dim/2)) * (np.linalg.det(Belief.nHess)**0.5) * np.exp(-(1/2) * np.sum((theta - Belief.MAP) @ (Belief.nHess) * (theta - Belief.MAP), axis=1))
     
     samples = Belief.MAP + (sqrtm(np.linalg.inv(Belief.nHess)) @ Belief.sample_points.T).T
     N = len(samples)
+
+    iterations = 10 # this is for SIR iterations numbers
 
     for _ in range(iterations) :
         weights = true_pdf(samples) / proposal_pdf(samples)
@@ -18,6 +20,7 @@ def SIR(Belief, iterations) :
     
     return samples
 
+def bin_en(p): return np.nan_to_num( - p*np.log(p) - (1-p)*np.log(1-p) )
 
 # Algo
 class DURM():
@@ -37,9 +40,9 @@ class BALD():
         self.f = model
 
     def query(self, Belief, queries):
-        samples = SIR(Belief, 10)
+        samples = SIR(Belief)
         
-        # f(samples, queries) 결과 한 번 계산
+        # f(samples, queries) once calculate
         f_samples_queries = self.f(samples, queries)
         M = len(samples)
         H1_pos = (np.sum(f_samples_queries, axis=0) / M) * np.log(np.sum(f_samples_queries, axis=0)/M) 
@@ -51,6 +54,56 @@ class BALD():
         gain = H1 - H2
         idx = np.argmax(gain)
         return idx
+
+class MaxEnt():
+    def __init__(self, model):
+        self.f = model
+        
+    def query(self, Belief, queries):
+        samples = SIR(Belief)
+        
+        # f(samples, queries) once calculate
+        f_samples_queries = self.f(samples, queries)
+
+        prob = np.mean(f_samples_queries,axis = 0)
+        idx = np.argmax(bin_en(prob))   
+        print(idx)    
+        return idx
+
+class VarRatio() :
+    def __init__(self, model):
+        self.f = model
+        
+    def query(self, Belief, queries):
+        samples = SIR(Belief)
+        
+        # f(samples, queries) once calculate
+        f_samples_queries = self.f(samples, queries)
+        
+        prob = np.mean(f_samples_queries,axis = 0)
+        max_p = np.max([prob, 1-prob], axis = 0)
+        idx = np.argmax(1 - max_p)
+        print(idx)
+        return idx
+
+class MeanStd() :
+    def __init__(self, model):
+        self.f = model
+
+    def query(self, Belief, queries):
+        samples = SIR(Belief)
+        
+        # f(samples, queries) once calculate
+        f_samples_queries = self.f(samples, queries)
+
+        
+        pos = np.sqrt(np.mean(f_samples_queries**2,axis = 0) - np.mean(f_samples_queries,axis = 0)**2)
+        neg = np.sqrt(np.mean((1-f_samples_queries)**2,axis = 0) - np.mean(1 - f_samples_queries,axis = 0)**2)
+        mean_std = pos + neg
+        idx = np.argmax(mean_std)
+        print(idx)
+        return idx
+
 
 # Experiments
 class Experiment_Realworld():
